@@ -1,0 +1,159 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <title>Quản lý bộ công cụ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <style type="text/css">
+    p {
+        margin-top: 6px;
+    }
+
+    textarea {
+        padding: 10px;
+        resize: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>BỘ CÔNG CỤ FACEBOOK</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text" id="accesstoken-input">Token</div>
+                    </div>
+                    <% if (!accessToken) { %>
+                    <input type="password" class="form-control" id="accessToken" placeholder="Nhập Token FB của bạn" aria-label="Input Your Token" aria-describedby="accesstoken-input">
+                    <% } else { %>
+                    <input type="text" class="form-control" value="Đăng nhập thành công :333" id="accessToken" aria-describedby="accesstoken-input" disabled>
+                    <% } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <% if (!accessToken) { %>
+                <button id="accessToken" onclick="AccessToken()" class="btn btn-primary">Xác nhận</button>
+                <% } else { %>
+                <button id="accessToken" class="btn btn-primary" disabled>Oke!</button>
+                <% } %>
+            </div>
+            <div class="col-md-12">
+                </br>
+                <textarea name="log" id="log" rows="17" style="width: 100%;" disabled></textarea>
+                <button id="clearlogs" onclick="ClearLogs()" class="btn btn-danger">Xoá log</button>
+            </div>
+            <div class="col-md-12 text-center">
+                <!-- Modal -->
+                <div class="modal fade" id="likeallpostindid" tabindex="-1" aria-labelledby="tudongthalike" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="tudongthalike">TỰ ĐỘNG THẢ LIKE TẤT CẢ BÀI VIẾT TỪ UID</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Chức năng sẽ lấy tất tất id bài viết từ người dùng và thả like :3
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="likes-uid" placeholder="Nhập UID người dùng facebook" aria-label="Input UID">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" onclick="LikesAll()" data-bs-dismiss="modal" class="btn btn-primary">Chạy!</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="likeallpostindid" data-bs-toggle="modal" data-bs-target="#likeallpostindid" disabled>Thích tất cả bài viết</button>
+                &nbsp;
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    setInterval(loadLog, 2000);
+
+    function AccessToken() {
+        $(function() {
+            var input_accesstoken = $('input#accessToken').val();
+            if (input_accesstoken.length > 0) {
+                $.ajax({
+                    url: '/submit_token',
+                    type: 'POST',
+                    data: {
+                        accessToken: input_accesstoken
+                    },
+                    success: function(data) {
+                        if (data.status == true) {
+                            $('input#accessToken').prop('disabled', true).val('Đăng nhập thành công :333').attr('type', 'text');
+                            $('button#accessToken').prop('disabled', true).text('Oke!');
+                            // id likeallpostindid
+                            $('button#likeallpostindid').prop('disabled', false);
+                        } else {
+                            alert('Token của bạn không hợp lệ hoặc chưa cấp full quyền');
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function LikesAll() {
+        $(function() {
+            var input_likes_uid = $('input#likes-uid').val();
+            if (input_likes_uid.length > 0) {
+                $.ajax({
+                    url: '/likes',
+                    type: 'POST',
+                    data: {
+                        uid: input_likes_uid
+                    }
+                });
+            }
+        });
+    }
+
+    function ClearLogs() {
+        $(function() {
+            $.ajax({
+                url: '/clear_logs'
+            });
+        });
+    }
+
+    function loadLog() {
+        $(function() {
+            var oldscrollHeight = $("textarea#log").attr("scrollHeight") - 20; //Scroll height before the request
+            $.ajax({
+                url: "/logs",
+                cache: false,
+                success: function(data) {
+                    $("textarea#log").text(data); //Insert chat log into the #chatbox div   
+
+                    //Auto-scroll           
+                    var newscrollHeight = $("textarea#log").attr("scrollHeight") - 20; //Scroll height after the request
+                    if (newscrollHeight > oldscrollHeight) {
+                        $("textarea#log").animate({ scrollTop: newscrollHeight }, 'normal'); //Autoscroll to bottom of div
+                    }
+                },
+            });
+        });
+    }
+    </script>
+    <% if (accessToken) { %>
+    <script type="text/javascript">
+    $(function() {
+        $('button#likeallpostindid').prop('disabled', false);
+    });
+    </script>
+    <% } %>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "facebook-tool",
+  "version": "1.0.0",
+  "description": "A Tool Facebook!",
+  "main": "main.js",
+  "scripts": {
+    "start": "pm2 start main.js --name  --watch"
+  },
+  "author": "kay0812",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parse": "^0.4.0",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "ejs": "^2.7.4",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "fb": "^2.0.0",
+    "fs": "0.0.1-security",
+    "html-minifier": "^4.0.0",
+    "jsdom": "^16.4.0",
+    "open": "^7.4.2",
+    "passport": "^0.4.1",
+    "passport-facebook": "^3.0.0",
+    "prompt-sync": "^4.2.0",
+    "query-string": "^6.14.0",
+    "readline": "^1.3.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "xmlhttprequest": "^1.8.0"
+  }
+}
